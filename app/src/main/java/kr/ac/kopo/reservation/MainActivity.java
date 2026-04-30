@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.Chronometer;
+import android.widget.DatePicker;
+import android.widget.FrameLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -21,12 +23,13 @@ import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
     Chronometer  chronometer;
     RadioGroup rg;
-    CalendarView calendar;
+    DatePicker calendar;
     TimePicker timePick;
     TextView textResult;
 
     int selectedYear, selectedMonth, selectedDay;
     int selectedHour, selectedMin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,29 +47,35 @@ public class MainActivity extends AppCompatActivity {
         timePick = findViewById(R.id.time_picker);
         textResult = findViewById(R.id.text_result);
 
+        rg.setVisibility(View.INVISIBLE);
         calendar.setVisibility(View.INVISIBLE);
+        timePick.setVisibility(View.INVISIBLE);
 
-        Button btnStart = findViewById(R.id.btn_start);
-        Button btnDone = findViewById(R.id.btn_done);
-
-
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        chronometer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 chronometer.setBase(SystemClock.elapsedRealtime());
                 chronometer.start();
                 chronometer.setTextColor(Color.RED);
+                rg.setVisibility(View.VISIBLE);
             }
         });
 
-        btnDone.setOnClickListener(new View.OnClickListener() {
+        textResult.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 chronometer.stop();
                 chronometer.setTextColor(Color.BLUE);
+                selectedYear = calendar.getYear();
+                selectedMonth = calendar.getMonth() + 1;
+                selectedDay = calendar.getDayOfMonth();
                 selectedHour = timePick.getHour();
                 selectedMin = timePick.getMinute();
                 textResult.setText(selectedYear + "년 " + selectedMonth + "월 " + selectedDay + "일 " +  selectedHour +"시 " + selectedMin + "분으로 예약 완료");
+                rg.setVisibility(View.INVISIBLE);
+                timePick.setVisibility(View.INVISIBLE);
+                calendar.setVisibility(View.INVISIBLE);
+                return true;
             }
         });
 
@@ -82,13 +91,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                selectedYear = year;
-                selectedMonth = month + 1;
-                selectedDay = dayOfMonth;
-            }
-        });
     }
 }
